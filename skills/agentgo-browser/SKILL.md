@@ -117,3 +117,8 @@ try {
 - **Connection & auth** [references/connection.md](references/connection.md)
 - **Session management** [references/session-management.md](references/session-management.md)
 - **Running Playwright code** [references/running-code.md](references/running-code.md)
+
+## Tips & Anti-Detection
+
+- **General anti-bot bypass** [references/tips-general.md](references/tips-general.md) — mobile emulation, human-like typing, cookie auth, natural navigation
+- **X (Twitter)** [references/tips-x-twitter.md](references/tips-x-twitter.md) — iPhone context, cookie auth, reply workflow, key selectors
