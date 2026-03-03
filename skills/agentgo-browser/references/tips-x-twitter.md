@@ -21,17 +21,60 @@ const context = await browser.newContext({
 
 ## Authentication via Cookies
 
-X requires two cookies for authenticated sessions. Obtain them from a logged-in browser session (DevTools > Application > Cookies):
+X requires two cookies for authenticated sessions. **Ask the user to provide these values** — do not attempt to automate the login flow, as X's login has heavy anti-bot protection (CAPTCHAs, email/SMS challenges).
 
 | Cookie | Purpose |
 |--------|---------|
 | `auth_token` | Session authentication |
 | `ct0` | CSRF token |
 
+### How to obtain cookies (instructions for the user)
+
+1. Open **Chrome** (or any Chromium-based browser) and log in to [x.com](https://x.com).
+2. Press `F12` (or `Cmd+Option+I` on Mac) to open **DevTools**.
+3. Go to the **Application** tab (click `>>` if you don't see it).
+4. In the left sidebar, expand **Cookies** and click **https://x.com**.
+5. Find the rows for `auth_token` and `ct0` in the cookie table.
+6. Double-click each **Value** cell to select it, then copy (`Cmd+C` / `Ctrl+C`).
+
+> **Tip:** You can also use the **Console** tab and run:
+> ```js
+> document.cookie.split('; ').filter(c => c.startsWith('auth_token=') || c.startsWith('ct0='))
+> ```
+
+### Important notes
+
+- Cookies expire when you log out or after a period of inactivity — re-extract if you get 401/403 errors.
+- **Never** commit cookie values to source control. Use environment variables or a local config file excluded by `.gitignore`.
+- Each cookie pair is tied to a single account session.
+
+### Injecting cookies in code
+
 ```typescript
 await context.addCookies([
   { name: "auth_token", value: "<your_auth_token>", domain: ".x.com", path: "/" },
   { name: "ct0", value: "<your_ct0>", domain: ".x.com", path: "/" },
+]);
+```
+
+### Using a config file
+
+Store cookies in a local JSON file (add to `.gitignore`):
+
+```json
+{
+  "auth_token": "your_auth_token_here",
+  "ct0": "your_ct0_here"
+}
+```
+
+```typescript
+import { readFileSync } from "fs";
+
+const config = JSON.parse(readFileSync("x_config.json", "utf8"));
+await context.addCookies([
+  { name: "auth_token", value: config.auth_token, domain: ".x.com", path: "/" },
+  { name: "ct0", value: config.ct0, domain: ".x.com", path: "/" },
 ]);
 ```
 
